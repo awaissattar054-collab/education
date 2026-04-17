@@ -4,6 +4,10 @@ const supabaseUrl = "https://flbbfwlyaunxjnvjqoek.supabase.co";
 
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsYmJmd2x5YXVueGpudmpxb2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDYyNTgsImV4cCI6MjA5MTEyMjI1OH0.GzOmQ6Ie2jGxjyRwLf8iPNEhS6Vo3RKWwraRgN5D-eI";
 
+console.log("Initializing Supabase Client...");
+console.log("Target URL:", supabaseUrl);
+console.log("API Key (first 10 chars):", supabaseKey.substring(0, 10) + "...");
+
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Compatibility export for existing code
