@@ -126,6 +126,17 @@ export default function App() {
   });
 
   useEffect(() => {
+    // Check for errors in the URL hash (common after Supabase redirects)
+    const hash = window.location.hash;
+    if (hash && hash.includes('error=')) {
+      const params = new URLSearchParams(hash.replace('#', ''));
+      const errorMsg = params.get('error_description') || params.get('error') || 'Unknown authentication error';
+      toast.error(errorMsg, { duration: 10000 });
+      console.error("Supabase Auth Fragment Error:", errorMsg);
+      // Optional: Clear the hash to prevent repeated toasting on refresh
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+
     // Check current session
     const checkUser = async () => {
       const user = await getCurrentUser();
@@ -142,21 +153,26 @@ export default function App() {
     let subscription: any = null;
     try {
       const sb = getSupabase();
-      const { data } = sb.auth.onAuthStateChange(async (_event, session) => {
+      console.log("Setting up Supabase auth listener...");
+      const { data } = sb.auth.onAuthStateChange(async (event, session) => {
+        console.log("Supabase Auth Event:", event);
         if (session) {
+          console.log("Session found for user:", session.user.email);
           setIsLoggedIn(true);
           setUserEmail(session.user.email || '');
           const profile = await getUserProfile(session.user.id);
           setUserProfile(profile);
         } else {
+          console.log("No active session.");
           setIsLoggedIn(false);
           setUserEmail('');
           setUserProfile(null);
         }
       });
       subscription = data.subscription;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Supabase auth listener error:', error);
+      toast.error(`Auth initialization failed: ${error.message}`);
     }
 
     return () => {
